@@ -3,7 +3,7 @@ title: "Entre Dados e Produção do Conhecimento"
 subtitle: "Uma gamma de dados"
 author: "Bruna Climaco, Laio Luis, William Cardoso, Robson W. S. Pessoa"
 institute: "GAMMA"
-date: "2022/02/24 (updated: `r Sys.Date()`)"
+date: "2022/06/07"
 output:
   xaringan::moon_reader:
     includes:
@@ -50,14 +50,6 @@ class: inverse, center, middle
 class: inverse, center, middle
 
 # Quais estratégias vocês utilizam para coletar dados?
-
-
----
-background-image: url(img/biker.png)
-background-position: 50% 50%
-class: center, bottom, inverse
-
-# Se você não se equilibrar, os dados podem te derrubar!
 
 ---
 background-image: url(img/farol.png) 
@@ -201,244 +193,12 @@ df  |>
 
 ```
 
-
----
-## O que há de estranho neste dados?
-
-```{r echo=FALSE,eval=TRUE,tidy=FALSE,message=FALSE,warning=FALSE}
-
-library(readr)
-library(tidyverse)
-library(lubridate)
-library(ggplot2)
-library(gganimate)
-library(ggplotlyExtra)
-library(plotly)
-library(ggplotify)
-library(dplyr)
-library(units)
-
-dados <- read_delim("data/32497_.csv",
-                    ";", escape_double = FALSE, col_types =
-                      cols(DataHora_GMT = col_datetime(format = "%Y-%m-%d %H:%M:%S"),
-                           CorrPSol_Logico = col_integer()),
-                    trim_ws = TRUE)
-
-
-dados %>% mutate(ANO = year(DataHora_GMT)) %>%
-#  filter(ANO>2000) %>%
-  group_by(ANO) %>%
-#  filter(hour(DataHora_GMT) %in% c(12)) %>%
-  filter(!is.na(`RadSolAcum _Mjm-2`)) %>%
-  ggplot(aes(x=DataHora_GMT,y=`RadSolAcum _Mjm-2`)) +
-  #  geom_bar(stat = "identity",fill="#6cbfd3",color="#fac113") +
-  geom_point(shape=18, fill="#6cbfd3", color="#6cbfd3", size=0.5)+
-  labs(
-    title = "Medição Irradiância Solar",
-    x = "Dia",
-    y = parse(text = "`I`~~ group('[', kWh * m^-2, ']')")
-  ) +
-  theme(title = element_text(size = 18,colour = "#db4470"))+
-  theme(axis.title.x=element_text(size=16)) +
-  theme(axis.title.y=element_text(size=16)) +
-  theme(legend.text=element_text(size =16)) +
-  theme(axis.text=element_text(size =16))  +
-  theme(legend.position = "none")+
-  theme(panel.grid = element_blank(), axis.ticks.y = element_line())+
-  #  theme( axis.line = element_line(colour = "darkblue",
-  #                      size = 1, linetype = "solid"))+
-  theme(panel.border = element_rect(fill=NA, color = "#64D2AA", size = 2))+
-  theme(panel.background = element_rect(fill=NA,color = "gray70", size = 2),
-        panel.grid.major = element_line(color = "gray70", size = .5),
-        panel.grid.minor = element_line(color = "gray70", size = .25))+
-  # scale_x_continuous(breaks = seq(2009, 2018, by = 1))+
-  theme(axis.text.x = element_text(angle = 25, vjust = 1.0, hjust = 1.0))
-#+
- # facet_wrap(~ANO,ncol = 3)
-
-
-```
----
-## Vamos enxergar mais de perto?
-
-```{r echo=FALSE,eval=TRUE,tidy=FALSE,message=FALSE,warning=FALSE}
-
-library(readr)
-library(tidyverse)
-library(lubridate)
-library(ggplot2)
-library(gganimate)
-library(ggplotlyExtra)
-library(plotly)
-library(ggplotify)
-library(dplyr)
-library(units)
-
-dados %>% mutate(ANO = year(DataHora_GMT)) %>%
-  filter(ANO>2000) %>%
-  group_by(ANO) %>%
-#  filter(hour(DataHora_GMT) %in% c(12)) %>%
-  filter(!is.na(`RadSolAcum _Mjm-2`)) %>%
-  ggplot(aes(x=DataHora_GMT,y=`RadSolAcum _Mjm-2`)) +
-  #  geom_bar(stat = "identity",fill="#6cbfd3",color="#fac113") +
-  geom_point(shape=18, fill="#6cbfd3", color="#6cbfd3", size=0.5)+
-  labs(
-    title = "Medição Irradiância Solar",
-    x = "Dia",
-    y = parse(text = "`I`~~ group('[', kWh * m^-2, ']')")
-  ) +
-  theme(title = element_text(size = 18,colour = "#db4470"))+
-  theme(axis.title.x=element_text(size=16)) +
-  theme(axis.title.y=element_text(size=16)) +
-  theme(legend.text=element_text(size =16)) +
-  theme(axis.text=element_text(size =16))  +
-  theme(legend.position = "none")+
-  theme(panel.grid = element_blank(), axis.ticks.y = element_line())+
-  #  theme( axis.line = element_line(colour = "darkblue",
-  #                      size = 1, linetype = "solid"))+
-  theme(panel.border = element_rect(fill=NA, color = "#64D2AA", size = 2))+
-  theme(panel.background = element_rect(fill=NA,color = "gray70", size = 2),
-        panel.grid.major = element_line(color = "gray70", size = .5),
-        panel.grid.minor = element_line(color = "gray70", size = .25))+
-  # scale_x_continuous(breaks = seq(2009, 2018, by = 1))+
-  theme(axis.text.x = element_text(angle = 25, vjust = 1.0, hjust = 1.0))+
-  facet_wrap(~ANO,ncol = 3)
-```
----
-## E se observamos apenas os valores para 12h?
-
-```{r echo=FALSE,eval=TRUE,tidy=FALSE,message=FALSE,warning=FALSE}
-dados %>% mutate(ANO = year(DataHora_GMT)) %>%
-  filter(ANO>2000) %>%
-  group_by(ANO) %>%
-  filter(hour(DataHora_GMT) %in% c(12)) %>%
-  filter(!is.na(`RadSolAcum _Mjm-2`)) %>%
-  ggplot(aes(x=DataHora_GMT,y=`RadSolAcum _Mjm-2`)) +
-  #  geom_bar(stat = "identity",fill="#6cbfd3",color="#fac113") +
-  geom_point(shape=18, fill="#6cbfd3", color="#6cbfd3", size=0.5)+
-  labs(
-    title = "Medição Irradiância Solar 12:00",
-    x = "Dia",
-    y = parse(text = "`I`~~ group('[', kWh * m^-2, ']')")
-  ) +
-  theme(title = element_text(size = 18,colour = "#db4470"))+
-  theme(axis.title.x=element_text(size=16)) +
-  theme(axis.title.y=element_text(size=16)) +
-  theme(legend.text=element_text(size =16)) +
-  theme(axis.text=element_text(size =16))  +
-  theme(legend.position = "none")+
-  theme(panel.grid = element_blank(), axis.ticks.y = element_line())+
-  #  theme( axis.line = element_line(colour = "darkblue",
-  #                      size = 1, linetype = "solid"))+
-  theme(panel.border = element_rect(fill=NA, color = "#64D2AA", size = 2))+
-  theme(panel.background = element_rect(fill=NA,color = "gray70", size = 2),
-        panel.grid.major = element_line(color = "gray70", size = .5),
-        panel.grid.minor = element_line(color = "gray70", size = .25))+
-  # scale_x_continuous(breaks = seq(2009, 2018, by = 1))+
-  theme(axis.text.x = element_text(angle = 25, vjust = 1.0, hjust = 1.0))+
-  facet_wrap(~ANO,ncol = 3)
-```
-
----
-## Vamos avaliar apenas entre 2005 e 2009?
-
-```{r echo=FALSE,eval=TRUE,tidy=FALSE,message=FALSE,warning=FALSE}
-
-dados %>% mutate(ANO = year(DataHora_GMT)) %>%
-  filter(ANO>2005 & ANO<2009) %>%
-  group_by(ANO) %>%
-  filter(hour(DataHora_GMT) %in% c(12)) %>%
-  filter(!is.na(`RadSolAcum _Mjm-2`)) %>%
-  ggplot(aes(x=DataHora_GMT,y=`RadSolAcum _Mjm-2`)) +
-  #  geom_bar(stat = "identity",fill="#6cbfd3",color="#fac113") +
-  geom_point(shape=18, fill="#6cbfd3", color="#6cbfd3", size=0.5)+
-  labs(
-    title = "Medição Irradiância Solar 12:00",
-    x = "Dia",
-    y = parse(text = "`I`~~ group('[', kWh * m^-2, ']')")
-  ) +
-  theme(title = element_text(size = 18,colour = "#db4470"))+
-  theme(axis.title.x=element_text(size=16)) +
-  theme(axis.title.y=element_text(size=16)) +
-  theme(legend.text=element_text(size =16)) +
-  theme(axis.text=element_text(size =16))  +
-  theme(legend.position = "none")+
-  theme(panel.grid = element_blank(), axis.ticks.y = element_line())+
-  #  theme( axis.line = element_line(colour = "darkblue",
-  #                      size = 1, linetype = "solid"))+
-  theme(panel.border = element_rect(fill=NA, color = "#64D2AA", size = 2))+
-  theme(panel.background = element_rect(fill=NA,color = "gray70", size = 2),
-        panel.grid.major = element_line(color = "gray70", size = .5),
-        panel.grid.minor = element_line(color = "gray70", size = .25))+
-  # scale_x_continuous(breaks = seq(2009, 2018, by = 1))+
-  theme(axis.text.x = element_text(angle = 25, vjust = 1.0, hjust = 1.0))+
-  facet_wrap(~ANO,ncol = 1)
-```
-
----
-## Se há algo estranho é preciso observar 12, 15 e 18h! 
-
-```{r echo=FALSE,eval=TRUE,tidy=FALSE,message=FALSE,warning=FALSE}
-
-dados %>% mutate(ANO = year(DataHora_GMT)) %>%
-  mutate(hora = hour(DataHora_GMT)) %>%
-  filter(ANO %in% c(2008)) %>%
-  group_by(hora) %>%
-  filter(hour(DataHora_GMT) %in% c(12,15,18)) %>%
-  filter(!is.na(`RadSolAcum _Mjm-2`)) %>%
-  ggplot(aes(x=DataHora_GMT,y=`RadSolAcum _Mjm-2`,color=hora)) +
-  #  geom_bar(stat = "identity",fill="#6cbfd3",color="#fac113") +
-  #geom_point(shape=18, fill="#fac113", color="#fac113", size=2)+
-  geom_point(size=2)+
-  labs(
-    title = "Medição Irradiância Solar (2008)",
-    x = "Dia",
-    y = parse(text = "`I`~~ group('[', kWh * m^-2, ']')")
-  ) +
-  theme(title = element_text(size = 18,colour = "#db4470"))+
-  theme(axis.title.x=element_text(size=16)) +
-  theme(axis.title.y=element_text(size=16)) +
-  theme(legend.text=element_text(size =14)) +
-  theme(axis.text=element_text(size =14))  +
-#  theme(legend.position = "none")+
-  theme(panel.grid = element_blank(), axis.ticks.y = element_line())+
-  #  theme( axis.line = element_line(colour = "darkblue",
-  #                      size = 1, linetype = "solid"))+
-  theme(panel.border = element_rect(fill=NA, color = "#64D2AA", size = 2))+
-  theme(panel.background = element_rect(fill=NA,color = "gray90", size = 2),
-        panel.grid.major = element_line(color = "gray90", size = .5),
-        panel.grid.minor = element_line(color = "gray90", size = .25))+
-  # scale_x_continuous(breaks = seq(2009, 2018, by = 1))+
-  theme(axis.text.x = element_text(angle = 25, vjust = 1.0, hjust = 1.0)) #+
-  #facet_wrap(~hora,ncol = 4)
-```
-
----
-
-
-background-image: url(img/Hospital.png) 
-background-position: 25% 50%
-class: center, bottom
-
-# Saúde
-
-
-
 ---
 background-image: url(img/pessoas.png) 
 background-position: 50% 50%
 class: center, bottom, inverse
 
 # População
-
-
----
-## População de Salvador/BA
-
-
-```{r,echo=FALSE,out.width = "400px"}
-knitr::include_graphics("img/construtura_carioca_cn_1930_v04.png")
-```
 
 ---
 ## Exemplo - Codigo para Sidrar
@@ -592,6 +352,7 @@ dados_viol_sex_bahia_raca_cor %>%
 
 1. [App Segurança Pública](https://robsonpessoa.shinyapps.io/ssp_indicadores/)
 
+2. [App Lei Seca](https://o271mj-william-sacramento.shinyapps.io/tentativa_2/)
 ---
 # Engajamentos, Eventos e Difusão 
 
